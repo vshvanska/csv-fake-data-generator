@@ -46,7 +46,7 @@ $(document).ready(function() {
             let oldName = $(this).attr("name");
             let newName = oldName.replace(formRegex, "form-" + formNum + "-");
             $(this).attr("name", newName);
-            $(this).addClass("form-control col-md").val(""); // Очищаємо значення полів у новій формі
+            $(this).addClass("form-control col-md").val("");
         });
 
         $("#form-container").append(newForm);

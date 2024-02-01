@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import generic
-from django.views.generic import CreateView
 
 from .forms import SchemaForm, ColumnFormset
 from .models import Schema, Column
@@ -23,7 +23,7 @@ def create_schema(request):
                 column.schema = schema
                 column.save()
                 print(column.schema)
-            return redirect('schemas:list_all_schemas')
+            return redirect('schemas:schema-list')
     return render(request, "schemas/schema_create.html", {'form': schema_form,
                                                           'formset': formset})
 
@@ -32,4 +32,9 @@ class SchemaList(generic.ListView):
     model = Schema
     paginate_by = 5
     queryset = Schema.objects.select_related("user")
+
+
+class SchemaDelete(generic.DeleteView):
+    model = Schema
+    success_url = reverse_lazy("schemas:schema-list")
 

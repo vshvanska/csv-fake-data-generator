@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Schema List <a href="{% url 'schemas:create_schema' %}">+</a></h1>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Schema</th>
+                    <th>Download</th>
+                    <th>Created_at</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for schema in schema_list %}
+                  {% if user.id == schema.user_id %}
+                    <tr>
+                        <td>{{ schema.title }}</td>
+                        <td><a href="#">Download</a></td>
+                        <td>date</td>
+                        <td>
+                            <a class="btn btn-danger" href="{% url 'schemas:schema-delete' pk=schema.id %}">Delete</a>
+                        </td>
+                    </tr>
+                  {% endif %}
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No schemas found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
