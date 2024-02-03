@@ -1,3 +1,5 @@
+import os
+
 from datetime import datetime
 from schemas.data_writer import DataWriter
 from schemas.faker import DataFaker
@@ -7,7 +9,7 @@ from schemas.models import Schema, Column
 class SchemaHandler:
     def __init__(self, schema: Schema):
         self.schema = schema
-        self.csv_patch = f"{schema.title}.{schema.user_id}.{datetime.now()}"
+        self.file_name = f"{schema.id}_{schema.user_id}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
 
     def create_data(self):
         rows_to_write = []
@@ -43,5 +45,5 @@ class SchemaHandler:
             return faker.get_address()
 
     def write_data(self, headers, rows_to_write):
-        writer = DataWriter(headers, rows_to_write, self.csv_patch)
+        writer = DataWriter(headers, rows_to_write, self.file_name, self.schema.column_separator, self.schema.string_character)
         return writer.write_data()
