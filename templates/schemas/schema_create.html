@@ -49,6 +49,10 @@ $(document).ready(function() {
             $(this).addClass("form-control col-md").val("");
         });
 
+        let csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+        newForm.find("input[name='csrfmiddlewaretoken']").attr("id", "csrfmiddlewaretoken-" + formNum);
+        newForm.find("input[name='csrfmiddlewaretoken']").val(csrfToken);
+
         $("#form-container").append(newForm);
         totalForms.val(formNum + 1);
     });
@@ -63,6 +67,7 @@ $(document).ready(function() {
             alert("You cannot remove the last form.");
         }
     });
+
     document.getElementById("create-button").addEventListener("click", function() {
         document.getElementById("my-form").submit();
     });

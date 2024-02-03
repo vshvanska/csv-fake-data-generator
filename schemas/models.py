@@ -30,6 +30,7 @@ class Schema(models.Model):
     )
     column_separator = models.CharField(max_length=1,  choices=SEPARATOR_CHOICES)
     string_character = models.CharField(max_length=1, choices=STRING_CHARACTER_CHOICES)
+    number_of_rows = models.IntegerField(validators=[MinValueValidator(1)])
 
     def __str__(self) -> str:
         return self.title
