@@ -18,10 +18,9 @@ class SchemaHandler:
         columns = self.get_columns()
         return [column.name for column in columns]
 
-    def create_data(self):
+    def create_data(self, rows):
         rows_to_write = []
         columns = self.get_columns()
-        rows = self.schema.number_of_rows
         for row in range(rows):
             row = []
             for column in columns:

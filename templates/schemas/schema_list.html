@@ -6,21 +6,22 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Schema</th>
-                    <th>Download</th>
-                    <th>Created_at</th>
-                    <th>Delete</th>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Modified</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for schema in schema_list %}
                   {% if user.id == schema.user_id %}
                     <tr>
-                        <td>{{ schema.title }}</td>
-                        <td><a href="#">Download</a></td>
-                        <td>date</td>
+                        <td>{{ schema.id }}</td>
+                        <td><a href="{% url 'schemas:schema-detail' pk=schema.id %}">{{ schema.title }}</a></td>
+                        <td>{{ schema.created_at }}</td>
                         <td>
-                            <a class="btn btn-danger" href="{% url 'schemas:schema-delete' pk=schema.id %}">Delete</a>
+                          <a class="btn btn-primary" href="{% url 'schemas:schema-delete' pk=schema.id %}">Edit</a>
+                          <a class="btn btn-danger" href="{% url 'schemas:schema-delete' pk=schema.id %}">Delete</a>
                         </td>
                     </tr>
                   {% endif %}

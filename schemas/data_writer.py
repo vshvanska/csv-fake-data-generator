@@ -13,11 +13,8 @@ class DataWriter:
         self.quotechar = quotechar
 
     def write_data(self):
-        print("start write data")
         path = os.path.join(settings.MEDIA_ROOT, self.file)
-        print(path)
         with open(path, mode='w', newline='') as file:
-            print('open file')
             writer = csv.writer(file, delimiter=self.delimiter, quotechar=self.quotechar)
             writer.writerow(self.headers)
             writer.writerows(self.rows)

@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views import generic
+from django.urls import reverse_lazy, reverse
+from django.views import generic, View
 
 from .forms import SchemaForm, ColumnFormset
 from .models import Schema, Column
@@ -23,19 +25,40 @@ def create_schema(request):
                 column = form.save(commit=False)
                 column.schema = schema
                 column.save()
-            create_fake_data.delay(schema.id)
             return redirect('schemas:schema-list')
     return render(request, "schemas/schema_create.html", {'form': schema_form,
                                                           'formset': formset})
 
 
-class SchemaList(generic.ListView):
+class SchemaList(LoginRequiredMixin, generic.ListView):
     model = Schema
     paginate_by = 5
     queryset = Schema.objects.select_related("user")
 
 
-class SchemaDelete(generic.DeleteView):
+class SchemaDetail(generic.DetailView):
+    model = Schema
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.prefetch_related('datasets', 'columns')
+
+    def post(self, request, *args, **kwargs):
+        schema_id = kwargs['pk']
+        schema = self.get_object()
+
+        number_of_rows = request.POST.get('number_of_rows')
+
+        if number_of_rows:
+
+            dataset = schema.datasets.create(schema=schema_id, number_of_rows=number_of_rows)
+            dataset.save()
+            create_fake_data.delay(dataset.id, schema_id)
+
+        return HttpResponseRedirect(reverse('schemas:schema-detail', kwargs={'pk': schema_id}))
+
+
+class SchemaDelete(LoginRequiredMixin, generic.DeleteView):
     model = Schema
     success_url = reverse_lazy("schemas:schema-list")
 
