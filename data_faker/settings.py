@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "accounts",
     "schemas",
     "crispy_bootstrap4",
-    "crispy_forms"
+    "crispy_forms",
+    'django_celery_results',
 
 ]
 
@@ -117,6 +118,22 @@ AUTH_USER_MODEL = "accounts.User"
 LOGIN_REDIRECT_URL = "/"
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_TIMEZONE = "Europe/Kyiv"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_CACHE_BACKEND = 'default'
+
+# django setting.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://localhost:6379',
+    }
+}
 
 LANGUAGE_CODE = "en-us"
 

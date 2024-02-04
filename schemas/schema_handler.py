@@ -11,16 +11,23 @@ class SchemaHandler:
         self.schema = schema
         self.file_name = f"{schema.id}_{schema.user_id}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
 
+    def get_columns(self):
+        return list(Column.objects.filter(schema=self.schema.id).order_by("order"))
+
+    def get_headers(self):
+        columns = self.get_columns()
+        return [column.name for column in columns]
+
     def create_data(self):
         rows_to_write = []
-        columns = list(Column.objects.filter(schema=self.schema.id).order_by("order"))
-        headers = [column.name for column in columns]
+        columns = self.get_columns()
         rows = self.schema.number_of_rows
         for row in range(rows):
             row = []
             for column in columns:
                 row.append(self.get_column_data(column))
             rows_to_write.append(row)
+        return rows_to_write
         self.write_data(headers, rows_to_write)
 
     @staticmethod
@@ -45,5 +52,9 @@ class SchemaHandler:
             return faker.get_address()
 
     def write_data(self, headers, rows_to_write):
-        writer = DataWriter(headers, rows_to_write, self.file_name, self.schema.column_separator, self.schema.string_character)
+        writer = DataWriter(headers,
+                            rows_to_write,
+                            self.file_name,
+                            self.schema.column_separator,
+                            self.schema.string_character)
         return writer.write_data()

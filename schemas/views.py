@@ -5,7 +5,7 @@ from django.views import generic
 
 from .forms import SchemaForm, ColumnFormset
 from .models import Schema, Column
-from .schema_handler import SchemaHandler
+from .task import create_fake_data
 
 
 def create_schema(request):
@@ -23,8 +23,7 @@ def create_schema(request):
                 column = form.save(commit=False)
                 column.schema = schema
                 column.save()
-            schema_handler = SchemaHandler(schema)
-            schema_handler.create_data()
+            create_fake_data.delay(schema.id)
             return redirect('schemas:schema-list')
     return render(request, "schemas/schema_create.html", {'form': schema_form,
                                                           'formset': formset})
