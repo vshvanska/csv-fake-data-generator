@@ -30,7 +30,6 @@ class Schema(models.Model):
     )
     column_separator = models.CharField(max_length=1,  choices=SEPARATOR_CHOICES)
     string_character = models.CharField(max_length=1, choices=STRING_CHARACTER_CHOICES)
-    number_of_rows = models.IntegerField(validators=[MinValueValidator(1)])
 
     def __str__(self) -> str:
         return self.title
@@ -60,3 +59,18 @@ class Column(models.Model):
 
     def __str__(self) -> str:
         return f"Schema id {self.schema} {self.name}"
+
+
+class DataSet(models.Model):
+    schema = models.ForeignKey(
+        Schema,
+        on_delete=models.CASCADE,
+        related_name="datasets"
+    )
+    created_at = models.DateTimeField(auto_now=True)
+    number_of_rows = models.IntegerField(validators=[MinValueValidator(1)])
+    file = models.CharField(max_length=255, blank=True)
+    is_ready = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f"{self.schema} {self.created_at}"

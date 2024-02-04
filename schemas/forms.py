@@ -5,7 +5,7 @@ from .models import Schema, Column
 class SchemaForm(forms.ModelForm):
     class Meta:
         model = Schema
-        fields = ['title', 'column_separator', 'string_character', "number_of_rows"]
+        fields = ['title', 'column_separator', 'string_character']
 
 
 ColumnFormset = forms.modelformset_factory(
