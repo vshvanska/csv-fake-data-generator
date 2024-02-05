@@ -1,19 +1,21 @@
+import os
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.views import generic, View
-
+from django.views import generic
 from .forms import SchemaForm, ColumnFormset
-from .models import Schema, Column
+from .models import Schema, Column, DataSet
 from .task import create_fake_data
 
 
 def create_schema(request):
     schema_form = SchemaForm(request.GET or None)
     formset = ColumnFormset(queryset=Column.objects.none())
-    if request.method == 'POST':
+    if request.method == "POST":
         schema_form = SchemaForm(request.POST)
         formset = ColumnFormset(request.POST)
         if schema_form.is_valid() and formset.is_valid():
@@ -25,9 +27,10 @@ def create_schema(request):
                 column = form.save(commit=False)
                 column.schema = schema
                 column.save()
-            return redirect('schemas:schema-list')
-    return render(request, "schemas/schema_create.html", {'form': schema_form,
-                                                          'formset': formset})
+            return redirect("schemas:schema-list")
+    return render(
+        request, "schemas/schema_create.html", {"form": schema_form, "formset": formset}
+    )
 
 
 class SchemaList(LoginRequiredMixin, generic.ListView):
@@ -41,24 +44,38 @@ class SchemaDetail(generic.DetailView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.prefetch_related('datasets', 'columns')
+        return queryset.prefetch_related("datasets", "columns")
 
     def post(self, request, *args, **kwargs):
-        schema_id = kwargs['pk']
+        schema_id = kwargs["pk"]
         schema = self.get_object()
 
-        number_of_rows = request.POST.get('number_of_rows')
+        number_of_rows = request.POST.get("number_of_rows")
 
         if number_of_rows:
-
-            dataset = schema.datasets.create(schema=schema_id, number_of_rows=number_of_rows)
+            dataset = schema.datasets.create(
+                schema=schema_id, number_of_rows=number_of_rows
+            )
             dataset.save()
             create_fake_data.delay(dataset.id, schema_id)
 
-        return HttpResponseRedirect(reverse('schemas:schema-detail', kwargs={'pk': schema_id}))
+        return HttpResponseRedirect(
+            reverse("schemas:schema-detail", kwargs={"pk": schema_id})
+        )
 
 
 class SchemaDelete(LoginRequiredMixin, generic.DeleteView):
     model = Schema
     success_url = reverse_lazy("schemas:schema-list")
 
+
+def download_file(request, pk):
+    dataset = get_object_or_404(DataSet, pk=pk)
+    file_path = dataset.file.url[1:]  # Удалите ведущий слеш, который добавляется Django
+    file_absolute_path = os.path.join(settings.MEDIA_ROOT, file_path)
+    with open(file_absolute_path, "rb") as file:
+        response = HttpResponse(file.read(), content_type="application/octet-stream")
+        response[
+            "Content-Disposition"
+        ] = f'attachment; filename="{os.path.basename(file_absolute_path)}"'
+        return response

@@ -14,21 +14,19 @@ class Schema(models.Model):
     SEPARATOR_CHOICES = [
         (COMMA, "Comma(,)"),
         (SEMICOLON, "Semicolon(;)"),
-        (TAB, "Tab(\t)")
+        (TAB, "Tab(\t)"),
     ]
 
     STRING_CHARACTER_CHOICES = [
         (DOUBLE_QUOTE, 'Double Quotes(")'),
-        (SINGLE_QUOTE, "Single Quotes(')")
+        (SINGLE_QUOTE, "Single Quotes(')"),
     ]
 
     title = models.CharField(max_length=255)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="schemas"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="schemas"
     )
-    column_separator = models.CharField(max_length=1,  choices=SEPARATOR_CHOICES)
+    column_separator = models.CharField(max_length=1, choices=SEPARATOR_CHOICES)
     string_character = models.CharField(max_length=1, choices=STRING_CHARACTER_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -45,10 +43,14 @@ class Column(models.Model):
         ("Company", "Company"),
         ("Text", "Text"),
         ("Date", "Date"),
-        ("Address", "Address")
+        ("Address", "Address"),
     ]
 
-    schema = models.ForeignKey(Schema, on_delete=models.CASCADE, related_name="columns",)
+    schema = models.ForeignKey(
+        Schema,
+        on_delete=models.CASCADE,
+        related_name="columns",
+    )
     name = models.CharField(max_length=64)
     data_type = models.CharField(max_length=64, choices=DATA_TYPE_CHOICES)
     min_value = models.IntegerField(null=True, blank=True)
@@ -64,13 +66,11 @@ class Column(models.Model):
 
 class DataSet(models.Model):
     schema = models.ForeignKey(
-        Schema,
-        on_delete=models.CASCADE,
-        related_name="datasets"
+        Schema, on_delete=models.CASCADE, related_name="datasets"
     )
     created_at = models.DateTimeField(auto_now=True)
     number_of_rows = models.IntegerField(validators=[MinValueValidator(1)])
-    file = models.CharField(max_length=255, blank=True)
+    file = models.FileField(null=True, blank=True)
     is_ready = models.BooleanField(default=False)
 
     def __str__(self) -> str:

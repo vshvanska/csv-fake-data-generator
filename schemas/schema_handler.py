@@ -51,9 +51,11 @@ class SchemaHandler:
             return faker.get_address()
 
     def write_data(self, headers, rows_to_write):
-        writer = DataWriter(headers,
-                            rows_to_write,
-                            self.file_name,
-                            self.schema.column_separator,
-                            self.schema.string_character)
+        writer = DataWriter(
+            headers,
+            rows_to_write,
+            self.file_name,
+            self.schema.column_separator,
+            self.schema.string_character,
+        )
         return writer.write_data()

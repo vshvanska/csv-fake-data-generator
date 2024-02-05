@@ -39,15 +39,25 @@
     <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Created At</th>
-            <th>Number of Rows</th>
+          <th>#</th>
+          <th>Created At</th>
+          <th>Number of Rows</th>
+          <th>Status</th>
+          <th>Download</th>
         </tr>
     </thead>
     <tbody>
         {% for dataset in schema.datasets.all %}
         <tr>
+            <td>{{ dataset.id }}</td>
             <td>{{ dataset.created_at }}</td>
             <td>{{ dataset.number_of_rows }}</td>
+            <td>{% if dataset.is_ready %}
+                <button class="btn btn-success" type="button" disabled>Ready</button>
+            {% else %}
+                <button class="btn btn-secondary" type="button" disabled>Processing</button>
+            {% endif %}</td>
+             <td><a href="{% url 'schemas:download-file' pk=dataset.id %}" class="btn btn-outline-warning">Download</a></td>
         </tr>
         {% endfor %}
     </tbody>
