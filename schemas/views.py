@@ -71,7 +71,7 @@ class SchemaDelete(LoginRequiredMixin, generic.DeleteView):
 
 def download_file(request, pk):
     dataset = get_object_or_404(DataSet, pk=pk)
-    file_path = dataset.file.url[1:]  # Удалите ведущий слеш, который добавляется Django
+    file_path = dataset.file.url[1:]
     file_absolute_path = os.path.join(settings.MEDIA_ROOT, file_path)
     with open(file_absolute_path, "rb") as file:
         response = HttpResponse(file.read(), content_type="application/octet-stream")

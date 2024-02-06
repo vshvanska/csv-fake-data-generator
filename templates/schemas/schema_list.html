@@ -1,6 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Personal Data</h5>
+      <p class="card-text">Username: {{user.username}}</p>
+      <p class="card-text">Email: {{user.email}}</p>
+      <p class="card-text">Full name: {{user.first_name}} {{user.last_name}}</p>
+      <div class="d-flex">
+        <a href="{% url 'profile-update' pk=user.id%}" class="btn btn-primary">Edit Profile</a>
+      </div>
+    </div>
+  </div>
+
 <h1>Schema List <a href="{% url 'schemas:create_schema' %}">+</a></h1>
     <div class="container">
         <table class="table">
@@ -20,7 +32,6 @@
                         <td><a href="{% url 'schemas:schema-detail' pk=schema.id %}">{{ schema.title }}</a></td>
                         <td>{{ schema.created_at }}</td>
                         <td>
-                          <a class="btn btn-primary" href="{% url 'schemas:schema-delete' pk=schema.id %}">Edit</a>
                           <a class="btn btn-danger" href="{% url 'schemas:schema-delete' pk=schema.id %}">Delete</a>
                         </td>
                     </tr>

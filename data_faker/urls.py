@@ -19,8 +19,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+from accounts.views import UserUpdateView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("accounts/<int:pk>/update", UserUpdateView.as_view(), name="profile-update"),
     path("", include("schemas.urls", namespace="schemas")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

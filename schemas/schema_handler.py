@@ -1,5 +1,3 @@
-import os
-
 from datetime import datetime
 from schemas.data_writer import DataWriter
 from schemas.faker import DataFaker

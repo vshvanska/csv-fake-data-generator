@@ -1,4 +1,6 @@
 from celery import shared_task
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from schemas.data_writer import DataWriter
 from schemas.models import Schema, DataSet
 from schemas.schema_handler import SchemaHandler
@@ -23,3 +25,15 @@ def create_fake_data(dataset_id, schema_id):
     dataset.file = path
     dataset.is_ready = True
     dataset.save()
+    user = get_user_model().objects.get(pk=schema.user_id)
+    send_data_ready_email.delay([user.email])
+
+
+@shared_task()
+def send_data_ready_email(emails: list):
+    return send_mail(
+        "Dataset",
+        "Your dataset is ready. You can download it in your personal cabinet",
+        "datafakercsv@gmail.com",
+        emails,
+    )
