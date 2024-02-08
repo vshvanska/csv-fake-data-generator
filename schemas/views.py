@@ -2,6 +2,7 @@ import os
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,6 +13,7 @@ from .models import Schema, Column, DataSet
 from .task import create_fake_data
 
 
+@login_required
 def create_schema(request):
     schema_form = SchemaForm(request.GET or None)
     formset = ColumnFormset(queryset=Column.objects.none())
@@ -39,7 +41,7 @@ class SchemaList(LoginRequiredMixin, generic.ListView):
     queryset = Schema.objects.select_related("user")
 
 
-class SchemaDetail(generic.DetailView):
+class SchemaDetail(LoginRequiredMixin, generic.DetailView):
     model = Schema
 
     def get_queryset(self):
@@ -69,6 +71,7 @@ class SchemaDelete(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy("schemas:schema-list")
 
 
+@login_required
 def download_file(request, pk):
     dataset = get_object_or_404(DataSet, pk=pk)
     file_path = dataset.file.url[1:]
