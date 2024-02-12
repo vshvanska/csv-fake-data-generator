@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<div class="container">
+    <div class="row mt-4">
+    <h3>New Schema</h3>
+        <form method="POST" action="" id="my-form">
+            {% csrf_token %}
+            {{ form|crispy }}
+
+            <div id="form-container">
+            <h3>Columns</h3>
+                {{ formset.management_form }}
+                {% for form in formset %}
+                <div class="row schema-form mt-3">
+                    {% crispy form %}
+                    <button class="mt-4 btn btn-danger remove-form" type="button" style="height: 40px;">×</button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button id="add-form" class="btn btn-primary mt-2" type="button">Add Another column</button>
+            <button id="create-button" class="btn btn-success float-right mt-2" type="submit">Create</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+$(document).ready(function() {
+    let addButton = $("#add-form");
+    let totalForms = $("#id_form-TOTAL_FORMS");
+
+    addButton.click(function(e) {
+        e.preventDefault();
+
+        let newForm = $(".schema-form:first").clone();
+        let formRegex = RegExp("form-(\\d){1}-", "g");
+
+        let formNum = $(".schema-form").length;
+        newForm.find("input, select").each(function() {
+            let oldName = $(this).attr("name");
+            let newName = oldName.replace(formRegex, "form-" + formNum + "-");
+            $(this).attr("name", newName);
+            $(this).addClass("form-control col-md").val("");
+        });
+
+        let csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+        newForm.find("input[name='csrfmiddlewaretoken']").attr("id", "csrfmiddlewaretoken-" + formNum);
+        newForm.find("input[name='csrfmiddlewaretoken']").val(csrfToken);
+
+        $("#form-container").append(newForm);
+        totalForms.val(formNum + 1);
+    });
+
+    $(document).on("click", ".remove-form", function(e) {
+        e.preventDefault();
+        if ($(".schema-form").length > 1) {
+            $(this).closest(".schema-form").remove();
+            let formNum = $(".schema-form").length;
+            totalForms.val(formNum);
+        } else {
+            alert("You cannot remove the last form.");
+        }
+    });
+
+    document.getElementById("create-button").addEventListener("click", function() {
+        document.getElementById("my-form").submit();
+    });
+});
+</script>
+{% endblock content %}
